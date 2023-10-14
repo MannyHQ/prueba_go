@@ -1,0 +1,31 @@
+version: '3'
+
+services:
+  go-app:
+    container_name: go-app
+    image: mannyhq/go-app:1.0.0
+    build: ./go_api
+    dockerfile: Dockerfile
+    environment:
+      DATABASE_URL: "postgresql://1180880:1180880@go_db:5432/manuel?sslmode=disable" #host=go_db user=postgres password=postgres dbname=postgres sslmode=disable"
+    ports:
+      - "8000:8000"
+    depends_on:
+      - go_db
+  go_db:
+    container_name: go_db
+    image: postgres:16
+    environment:
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_USER: postgres
+      POSTGRES_DB: manuel
+    ports:
+      - "5435:5435"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+  proxy:
+    build: proxy
+    ports:
+      - 80:80
+    depends_on: 
+      - go-app
